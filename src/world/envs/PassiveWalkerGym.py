@@ -141,9 +141,9 @@ class PassiveWalkerEnv(MujocoEnv, utils.EzPickle):
         x_velocity, y_velocity = xy_velocity
 
         forward_reward = x_velocity * self._forward_reward_weight
-
+        lateral_reward = y_velocity * self._forward_reward_weight
         #TODO
-        reward = forward_reward
+        reward = forward_reward - lateral_reward
         observation = self._get_obs()
         info = {
             "reward_forward": forward_reward,
