@@ -277,7 +277,7 @@ def main():
     NSGA_opts["crossover_prob"] = 0.5
 
     results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'multi')
-    ea_multi_obj = NSGAII_sol(population_size, n_parameters, NSGA_opts, results_dir)
+    ea_multi_obj = NSGAII(population_size, n_parameters, NSGA_opts, results_dir)
 
     run_EA_multi(ea_multi_obj, world)
 
