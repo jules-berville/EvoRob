@@ -175,6 +175,7 @@ def run_EA_single(ea_single, world):
         for index, genotype in enumerate(pop):
             fit_ind, _ = world.evaluate_individual(genotype)
             fitnesses_gen[index] = fit_ind
+            print(f"Gen {gen} | Individual {index} | Fitness: {fit_ind}")
         ea_single.tell(pop, fitnesses_gen)
 
 
@@ -245,7 +246,7 @@ def visualise_individual(genotype):
 def main():
     # %% Understanding the world
     genotype = np.random.uniform(-1, 1, 953)  # 8 body parameters, 945 NN weights
-    visualise_individual(genotype)
+    #visualise_individual(genotype)
 
     # %% Optimise single-objective
     world = AntWorld()
