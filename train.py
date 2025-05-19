@@ -186,6 +186,7 @@ def run_EA_multi(ea_multi, world):
         for index, genotype in enumerate(pop):
             _, fit_ind = world.evaluate_individual(genotype)
             fitnesses_gen[index] = fit_ind
+            print(f"Gen {gen} | Individual {index} | Fitness: {fit_ind}")
         ea_multi.tell(pop, fitnesses_gen)
 
 
@@ -297,7 +298,7 @@ def main():
     CMAES_opts["min"] = -1
     CMAES_opts["max"] = 1
     CMAES_opts["num_parents"] = population_size
-    CMAES_opts["num_generations"] = 5
+    CMAES_opts["num_generations"] = 50
     CMAES_opts["mutation_sigma"] = 0.33
 
     results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'single')
@@ -309,21 +310,21 @@ def main():
     # %% Optimise multi-objective
     # TODO implement the NSGAII
     # world = AntWorld()
-    # n_parameters = world.n_params
+    n_parameters = world.n_params
 
-    # population_size = 250
-    # NSGA_opts["min"] = -1
-    # NSGA_opts["max"] = 1
-    # NSGA_opts["num_parents"] = population_size
-    # NSGA_opts["num_generations"] = 5
-    # NSGA_opts["mutation_prob"] = 0.3
-    # NSGA_opts["crossover_prob"] = 0.5
+    population_size = 250
+    NSGA_opts["min"] = -1
+    NSGA_opts["max"] = 1
+    NSGA_opts["num_parents"] = population_size
+    NSGA_opts["num_generations"] = 50
+    NSGA_opts["mutation_prob"] = 0.3
+    NSGA_opts["crossover_prob"] = 0.5
 
-    # results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'multi')
-    # ea_multi_obj = NSGAII(population_size, n_parameters, NSGA_opts, results_dir)
+    results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'multi')
+    ea_multi_obj = NSGAII(population_size, n_parameters, NSGA_opts, results_dir)
 
-    # print("Start multi-objective evolution")
-    # run_EA_multi(ea_multi_obj, world)
+    print("Start multi-objective evolution")
+    run_EA_multi(ea_multi_obj, world)
 
     # %% visualise
     # TODO: Make a video of the best individual, and plot the fitness curve.
@@ -345,7 +346,7 @@ def main():
     with open(world.world_file, "w") as f:
         f.write(world_xml)
 
-    generate_best_individual_video(world)
+    # generate_best_individual_video(world)
 
 
 if __name__ == "__main__":
