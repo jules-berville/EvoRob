@@ -6,13 +6,13 @@
 #SBATCH --qos=serial
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=8G
-#SBATCH --time=01:00:00
+#SBATCH --cpus-per-task=36
+#SBATCH --mem=180G
+#SBATCH --time=04:00:00
 
 
 # Load necessary modules
-source /home/plumet/.venv/bin/activate
+source .venv/bin/activate
 
 echo "STARTING AT: $(date)"
 

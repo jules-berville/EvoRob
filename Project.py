@@ -189,26 +189,67 @@ def run_EA_multi(ea_multi, world):
         ea_multi.tell(pop, fitnesses_gen)
 
 
-def generate_best_individual_video(world, video_name: str = 'EvoRob3_video.mp4'):
-    env = gym.make(ENV_NAME,
-                   robot_path=world.world_file,
-                   render_mode="rgb_array")
+# def generate_best_individual_video(world, video_name: str = 'EvoRob3_video.mp4'):
+#     env = gym.make(ENV_NAME,
+#                    robot_path=world.world_file,
+#                    render_mode="rgb_array")
+#     rewards_list = []
+
+#     observations, info = env.reset()
+#     frames = []
+#     for step in range(1000):
+#         frames.append(env.render())
+#         action = world.controller.get_action(observations)
+#         observations, rewards, terminated, truncated, info = env.step(action)
+#         rewards_list.append(rewards)
+#         if terminated:
+#             break
+#     print(np.sum(rewards_list))
+
+#     import imageio
+#     imageio.mimsave(video_name, frames, fps=30)  # Set frames per second (fps)
+#     env.close()
+
+
+
+def generate_best_individual_video(
+    world,
+    video_name: str = 'EvoRob3_video.mp4',
+    fps: int = 30,
+    out_dir: str = '.'
+):
+    # 1) Headless backend
+    os.environ.setdefault("MUJOCO_GL", "osmesa")
+    # 2) Ensure output directory exists
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, video_name)
+
+    # 3) Create the env
+    env = gym.make(
+        ENV_NAME,
+        robot_path=world.world_file,
+        render_mode="rgb_array"
+    )
     rewards_list = []
 
+    # 4) Roll out one episode
     observations, info = env.reset()
     frames = []
-    for step in range(1000):
+    for _ in range(world.n_steps):
+        # render returns an H×W×3 array
         frames.append(env.render())
         action = world.controller.get_action(observations)
-        observations, rewards, terminated, truncated, info = env.step(action)
+        observations, reward, terminated, truncated, info = env.step(action)
         rewards_list.append(rewards)
         if terminated:
             break
     print(np.sum(rewards_list))
 
-    import imageio
-    imageio.mimsave(video_name, frames, fps=30)  # Set frames per second (fps)
+    # 5) Write out MP4
+    imageio.mimsave(out_path, frames, fps=fps)
+    print(f"Saved video to: {out_path}")
     env.close()
+
 
 
 def visualise_individual(genotype):
@@ -255,35 +296,39 @@ def main():
     population_size = 250
     CMAES_opts["min"] = -1
     CMAES_opts["max"] = 1
-    CMAES_opts["num_parents"] = 100
-    CMAES_opts["num_generations"] = 100
+    CMAES_opts["num_parents"] = population_size
+    CMAES_opts["num_generations"] = 5
     CMAES_opts["mutation_sigma"] = 0.33
 
     results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'single')
     ea_single = CMAES(population_size, n_parameters, CMAES_opts, results_dir)
 
+    print("Start single-objective evolution")
     run_EA_single(ea_single, world)
 
     # %% Optimise multi-objective
     # TODO implement the NSGAII
-    world = AntWorld()
-    n_parameters = world.n_params
+    # world = AntWorld()
+    # n_parameters = world.n_params
 
-    population_size = 250
-    NSGA_opts["min"] = -1
-    NSGA_opts["max"] = 1
-    NSGA_opts["num_parents"] = population_size
-    NSGA_opts["num_generations"] = 100
-    NSGA_opts["mutation_prob"] = 0.3
-    NSGA_opts["crossover_prob"] = 0.5
+    # population_size = 250
+    # NSGA_opts["min"] = -1
+    # NSGA_opts["max"] = 1
+    # NSGA_opts["num_parents"] = population_size
+    # NSGA_opts["num_generations"] = 5
+    # NSGA_opts["mutation_prob"] = 0.3
+    # NSGA_opts["crossover_prob"] = 0.5
 
-    results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'multi')
-    ea_multi_obj = NSGAII(population_size, n_parameters, NSGA_opts, results_dir)
+    # results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'multi')
+    # ea_multi_obj = NSGAII(population_size, n_parameters, NSGA_opts, results_dir)
 
-    run_EA_multi(ea_multi_obj, world)
+    # print("Start multi-objective evolution")
+    # run_EA_multi(ea_multi_obj, world)
 
     # %% visualise
     # TODO: Make a video of the best individual, and plot the fitness curve.
+    print("Prepare video of the best individual")
+
     best_individual = np.load(os.path.join(results_dir, "99", "x_best.npy"))
 
     points, connectivity_mat = world.geno2pheno(best_individual)
