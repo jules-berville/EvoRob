@@ -293,7 +293,7 @@ def main():
     results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'multi')
     #results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'single')
 
-    best_individual = np.load(os.path.join(results_dir, "99", "x_best.npy"))
+    best_individual = np.load(os.path.join(results_dir, "49", "x_best.npy"))
 
     points, connectivity_mat = world.geno2pheno(best_individual)
     robot = AntRobot(points, connectivity_mat, world.joint_limits, world.joint_axis, verbose=False)

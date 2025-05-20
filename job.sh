@@ -16,6 +16,6 @@ source .venv/bin/activate
 
 echo "STARTING AT: $(date)"
 
-python3 Project.py
+python3 train.py
 
 echo "FINISHED AT: $(date)"
