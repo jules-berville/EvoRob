@@ -10,7 +10,7 @@ import xml.etree.ElementTree as xml
 import gymnasium as gym
 import numpy as np
 import os
-
+import matplotlib.pyplot as plt
 """ Large programming projects are often modularised in different components. 
     In the upcoming exercise(s) we will (re)build an evolutionary pipeline for robot evolution in MuJoCo.
 
@@ -152,7 +152,7 @@ class AntWorld(World):
 
             # Store rewards for active environments only
             rewards_full[step, done_mask == False] = rewards[done_mask == False]
-
+            
             multi_obj_reward = np.array([infos['reward_forward'], -infos['ctrl_cost']*0.02]).T  # TODO
             multi_obj_rewards_full[step, done_mask == False] = multi_obj_reward[done_mask == False]
 
@@ -162,10 +162,21 @@ class AntWorld(World):
             # Optionally, break if all environments have terminated
             if np.all(done_mask):
                 break
+
+        final_multi_obj_rewards = np.sum(multi_obj_rewards_full, axis=0)  # shape: (n_repeats, 2)
+
+        # Mask out failed rollouts based on forward reward
+        valid_mask = final_multi_obj_rewards[:, 0] >= -10  # keep only rollouts with decent forward reward
+
+        # If no valid rollouts, fallback to mean of all (or return a penalty)
+        if np.sum(valid_mask) == 0:
+            filtered_rewards = final_multi_obj_rewards
+        else:
+            filtered_rewards = final_multi_obj_rewards[valid_mask]
+
         final_rewards = np.sum(rewards_full, axis=0)
-        final_multi_obj_rewards = np.sum(multi_obj_rewards_full, axis=0)
         envs.close()
-        return np.mean(final_rewards), np.mean(final_multi_obj_rewards, axis=0)
+        return np.mean(final_rewards), np.median(filtered_rewards, axis=0)
 
 
 def run_EA_single(ea_single, world):
@@ -187,6 +198,8 @@ def run_EA_multi(ea_multi, world):
             _, fit_ind = world.evaluate_individual(genotype)
             fitnesses_gen[index] = fit_ind
             print(f"Gen {gen} | Individual {index} | Fitness: {fit_ind}")
+        plt.scatter(fitnesses_gen[:, 0], fitnesses_gen[:, 1])
+        plt.show()
         ea_multi.tell(pop, fitnesses_gen)
 
 
@@ -291,21 +304,21 @@ def main():
     #visualise_individual(genotype)
 
     # %% Optimise single-objective
-    world = AntWorld()
-    n_parameters = world.n_params
+    # world = AntWorld()
+    # n_parameters = world.n_params
 
-    population_size = 250
-    CMAES_opts["min"] = -1
-    CMAES_opts["max"] = 1
-    CMAES_opts["num_parents"] = population_size
-    CMAES_opts["num_generations"] = 50
-    CMAES_opts["mutation_sigma"] = 0.33
+    # population_size = 250
+    # CMAES_opts["min"] = -1
+    # CMAES_opts["max"] = 1
+    # CMAES_opts["num_parents"] = population_size
+    # CMAES_opts["num_generations"] = 50
+    # CMAES_opts["mutation_sigma"] = 0.33
 
-    results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'single')
-    ea_single = CMAES(population_size, n_parameters, CMAES_opts, results_dir)
+    # results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'single')
+    # ea_single = CMAES(population_size, n_parameters, CMAES_opts, results_dir)
 
-    print("Start single-objective evolution")
-    run_EA_single(ea_single, world)
+    # print("Start single-objective evolution")
+    # run_EA_single(ea_single, world)
 
     # %% Optimise multi-objective
     # TODO implement the NSGAII
