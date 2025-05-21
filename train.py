@@ -152,8 +152,8 @@ class AntWorld(World):
 
             # Store rewards for active environments only
             rewards_full[step, done_mask == False] = rewards[done_mask == False]
-            
-            multi_obj_reward = np.array([infos['reward_forward'], -infos['ctrl_cost']*0.02]).T  # TODO
+
+            multi_obj_reward = np.array([infos['reward_forward'], -infos['ctrl_cost']*0.005]).T  # TODO
             multi_obj_rewards_full[step, done_mask == False] = multi_obj_reward[done_mask == False]
 
             # Update the done mask based on the "done" and "truncated" flags
@@ -320,9 +320,9 @@ def main():
     # print("Start single-objective evolution")
     # run_EA_single(ea_single, world)
 
-    # %% Optimise multi-objective
-    # TODO implement the NSGAII
-    # world = AntWorld()
+    # # %% Optimise multi-objective
+    # # TODO implement the NSGAII
+    world = AntWorld()
     n_parameters = world.n_params
 
     population_size = 250
