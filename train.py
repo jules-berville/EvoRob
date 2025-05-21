@@ -153,7 +153,7 @@ class AntWorld(World):
             # Store rewards for active environments only
             rewards_full[step, done_mask == False] = rewards[done_mask == False]
 
-            multi_obj_reward = np.array([infos['reward_forward'], -infos['ctrl_cost']*0.02]).T  # TODO
+            multi_obj_reward = np.array([infos['reward_forward'], -infos['ctrl_cost']*0.005]).T  # TODO
             multi_obj_rewards_full[step, done_mask == False] = multi_obj_reward[done_mask == False]
 
             # Update the done mask based on the "done" and "truncated" flags
@@ -291,25 +291,25 @@ def main():
     #visualise_individual(genotype)
 
     # %% Optimise single-objective
-    world = AntWorld()
-    n_parameters = world.n_params
-
-    population_size = 250
-    CMAES_opts["min"] = -1
-    CMAES_opts["max"] = 1
-    CMAES_opts["num_parents"] = population_size
-    CMAES_opts["num_generations"] = 50
-    CMAES_opts["mutation_sigma"] = 0.33
-
-    results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'single')
-    ea_single = CMAES(population_size, n_parameters, CMAES_opts, results_dir)
-
-    print("Start single-objective evolution")
-    run_EA_single(ea_single, world)
-
-    # %% Optimise multi-objective
-    # TODO implement the NSGAII
     # world = AntWorld()
+    # n_parameters = world.n_params
+
+    # population_size = 250
+    # CMAES_opts["min"] = -1
+    # CMAES_opts["max"] = 1
+    # CMAES_opts["num_parents"] = population_size
+    # CMAES_opts["num_generations"] = 50
+    # CMAES_opts["mutation_sigma"] = 0.33
+
+    # results_dir = os.path.join(ROOT_DIR, 'results', ENV_NAME, 'single')
+    # ea_single = CMAES(population_size, n_parameters, CMAES_opts, results_dir)
+
+    # print("Start single-objective evolution")
+    # run_EA_single(ea_single, world)
+
+    # # %% Optimise multi-objective
+    # # TODO implement the NSGAII
+    world = AntWorld()
     n_parameters = world.n_params
 
     population_size = 250
