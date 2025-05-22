@@ -204,13 +204,13 @@ def run_EA_multi(ea_multi, world):
             fitnesses_gen[index] = fit_ind
             print(f"Gen {gen} | Individual {index} | Fitness: {fit_ind}")
 
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(fitnesses_gen[:, 0], fitnesses_gen[:, 1], fitnesses_gen[:, 2])
-        ax.set_xlabel('Fitness 1')
-        ax.set_ylabel('Fitness 2')
-        ax.set_zlabel('Fitness 3')
-        plt.show()
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111, projection='3d')
+        # ax.scatter(fitnesses_gen[:, 0], fitnesses_gen[:, 1], fitnesses_gen[:, 2])
+        # ax.set_xlabel('Fitness 1')
+        # ax.set_ylabel('Fitness 2')
+        # ax.set_zlabel('Fitness 3')
+        # plt.show()
         
         ea_multi.tell(pop, fitnesses_gen)
 
