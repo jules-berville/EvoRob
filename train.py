@@ -153,7 +153,12 @@ class AntWorld(World):
             # Store rewards for active environments only
             rewards_full[step, done_mask == False] = rewards[done_mask == False]
 
-            multi_obj_reward = np.array([infos['reward_forward'], -infos['ctrl_cost']*0.001]).T  # TODO
+            # Add stability components to your multi_obj_reward calculation
+            multi_obj_reward = np.array([
+                infos['reward_forward'],  
+                # -infos['ctrl_cost']*0.001,
+                infos['healthy_reward'],  # Penalize tilting
+            ]).T  
             multi_obj_rewards_full[step, done_mask == False] = multi_obj_reward[done_mask == False]
 
             # Update the done mask based on the "done" and "truncated" flags
@@ -163,7 +168,7 @@ class AntWorld(World):
             if np.all(done_mask):
                 break
 
-        final_multi_obj_rewards = np.sum(multi_obj_rewards_full, axis=0)  # shape: (n_repeats, 2)
+        final_multi_obj_rewards = np.sum(multi_obj_rewards_full, axis=0)  # shape: (n_repeats, 3)
 
         # Mask out failed rollouts based on forward reward
         valid_mask = final_multi_obj_rewards[:, 0] >= -10  # keep only rollouts with decent forward reward
@@ -198,8 +203,15 @@ def run_EA_multi(ea_multi, world):
             _, fit_ind = world.evaluate_individual(genotype)
             fitnesses_gen[index] = fit_ind
             print(f"Gen {gen} | Individual {index} | Fitness: {fit_ind}")
-        plt.scatter(fitnesses_gen[:, 0], fitnesses_gen[:, 1])
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(fitnesses_gen[:, 0], fitnesses_gen[:, 1], fitnesses_gen[:, 2])
+        ax.set_xlabel('Fitness 1')
+        ax.set_ylabel('Fitness 2')
+        ax.set_zlabel('Fitness 3')
         plt.show()
+        
         ea_multi.tell(pop, fitnesses_gen)
 
 
